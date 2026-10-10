@@ -4,6 +4,7 @@ using DistritoZero.Challenges;
 using DistritoZero.Missions;
 using DistritoZero.Player;
 using DistritoZero.Combat;
+using DistritoZero.Enemies;
 
 namespace DistritoZero.Tests.EditMode
 {
@@ -86,6 +87,38 @@ namespace DistritoZero.Tests.EditMode
             Assert.IsTrue(gate.TryConsume(1.0f));
             Assert.IsFalse(gate.TryConsume(1.2f));
             Assert.IsTrue(gate.TryConsume(1.4f));
+        }
+
+        [Test]
+        public void EnemyAI_PlayerDetected_TransitionsFromPatrolToAlertThenChase()
+        {
+            var brain = new EnemyStateMachine(6f, 9f, 1.8f);
+
+            Assert.AreEqual(EnemyState.Patrol, brain.CurrentState);
+            Assert.AreEqual(EnemyState.Alert, brain.Tick(true, 5f, false));
+            Assert.AreEqual(EnemyState.Chase, brain.Tick(true, 5f, false));
+        }
+
+        [Test]
+        public void EnemyAI_ClosePlayer_TransitionsToAttack_AndBackToChase()
+        {
+            var brain = new EnemyStateMachine(6f, 9f, 1.8f);
+
+            brain.Tick(true, 5f, false);
+            brain.Tick(true, 5f, false);
+            Assert.AreEqual(EnemyState.Attack, brain.Tick(true, 1.5f, false));
+            Assert.AreEqual(EnemyState.Chase, brain.Tick(true, 3f, false));
+        }
+
+        [Test]
+        public void EnemyAI_LostPlayer_ReturnsToPatrolRoute()
+        {
+            var brain = new EnemyStateMachine(6f, 9f, 1.8f);
+
+            brain.Tick(true, 5f, false);
+            brain.Tick(true, 5f, false);
+            Assert.AreEqual(EnemyState.Return, brain.Tick(true, 10f, false));
+            Assert.AreEqual(EnemyState.Patrol, brain.Tick(false, float.PositiveInfinity, true));
         }
     }
 }
