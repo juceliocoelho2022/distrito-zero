@@ -7,5 +7,5 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/DistritoZero.unity
-    guid: 00000000000000000000000000000000
+    guid: 8f4f74f3f1ce4f3a9f70d7e3d12b2c41
   m_configObjects: {}

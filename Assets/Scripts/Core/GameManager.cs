@@ -23,8 +23,14 @@ namespace DistritoZero.Core
 
         public void RestartCheckpoint()
         {
-            var scene = SceneManager.GetActiveScene();
-            SceneManager.LoadScene(scene.buildIndex);
+            Scene scene = SceneManager.GetActiveScene();
+            if (!scene.IsValid() || scene.buildIndex < 0)
+            {
+                Debug.LogError($"Cannot restart scene '{scene.name}': it is not registered in Build Settings.");
+                return;
+            }
+
+            SceneManager.LoadScene(scene.buildIndex, LoadSceneMode.Single);
         }
 
         public void CompleteChapter() => ChapterFinished = true;

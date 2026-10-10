@@ -4,6 +4,13 @@ using DistritoZero.Combat;
 
 namespace DistritoZero.Player
 {
+    public enum ShotFeedbackState
+    {
+        None,
+        Fired,
+        Hit
+    }
+
     public class PlayerShooter : MonoBehaviour
     {
         [SerializeField] private float shotDamage = 30f;
@@ -12,6 +19,7 @@ namespace DistritoZero.Player
 
         private ShotCooldown cooldown;
         public bool LastShotHit { get; private set; }
+        public ShotFeedbackState LastFeedbackState { get; private set; } = ShotFeedbackState.None;
         public float FeedbackUntil { get; private set; }
 
         private void Awake()
@@ -31,8 +39,14 @@ namespace DistritoZero.Player
             if (!cooldown.TryConsume(Time.time)) return false;
 
             LastShotHit = ShootFromScreenCenter();
+            LastFeedbackState = ResolveFeedbackState(LastShotHit);
             FeedbackUntil = Time.time + 0.12f;
             return true;
+        }
+
+        public static ShotFeedbackState ResolveFeedbackState(bool hit)
+        {
+            return hit ? ShotFeedbackState.Hit : ShotFeedbackState.Fired;
         }
 
         private bool ShootFromScreenCenter()

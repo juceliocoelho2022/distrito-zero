@@ -115,7 +115,7 @@ namespace DistritoZero.Core
 
         private void OnGUI()
         {
-            GUI.Box(new Rect(15,15,480,105), "DISTRITO ZERO — v0.2.2");
+            GUI.Box(new Rect(15,15,480,105), "DISTRITO ZERO — v0.2.4");
             if (mission != null) GUI.Label(new Rect(30,45,450,25), "OBJETIVO: " + mission.ObjectiveText);
             if (playerHealth != null) GUI.Label(new Rect(30,70,220,25), $"VIDA: {playerHealth.CurrentHealth:0}/{playerHealth.MaxHealth:0}");
             if (xp != null) GUI.Label(new Rect(260,70,180,25), $"XP: {xp.CurrentXp}");
@@ -146,8 +146,13 @@ namespace DistritoZero.Core
         private void DrawCrosshair()
         {
             Color previous = GUI.color;
-            if (shooter != null && Time.time < shooter.FeedbackUntil && shooter.LastShotHit)
-                GUI.color = new Color(1f, 0.25f, 0.2f);
+            if (shooter != null && Time.time < shooter.FeedbackUntil)
+            {
+                if (shooter.LastFeedbackState == ShotFeedbackState.Hit)
+                    GUI.color = new Color(1f, 0.25f, 0.2f);
+                else if (shooter.LastFeedbackState == ShotFeedbackState.Fired)
+                    GUI.color = new Color(0.25f, 0.85f, 1f);
+            }
 
             var style = new GUIStyle(GUI.skin.label)
             {
