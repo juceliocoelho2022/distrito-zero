@@ -97,6 +97,20 @@ namespace DistritoZero.Tests.EditMode
         }
 
         [Test]
+        public void ShotVfx_Lifetime_ExpiresAfterConfiguredDuration()
+        {
+            Assert.IsTrue(ShotVisualEffect.IsVisible(0.05f, 0.08f));
+            Assert.IsFalse(ShotVisualEffect.IsVisible(0.081f, 0.08f));
+        }
+
+        [TestCase(false, false)]
+        [TestCase(true, true)]
+        public void ShotVfx_Impact_IsOnlyShownForDamageableHit(bool hitDamageable, bool expected)
+        {
+            Assert.AreEqual(expected, ShotVisualEffect.ShouldShowImpact(hitDamageable));
+        }
+
+        [Test]
         public void EnemyAI_PlayerDetected_TransitionsFromPatrolToAlertThenChase()
         {
             var brain = new EnemyStateMachine(6f, 9f, 1.8f);
