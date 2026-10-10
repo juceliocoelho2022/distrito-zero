@@ -2,6 +2,14 @@
 
 RPG 3D cyberpunk educacional feito em **Unity + C#**, preparado para edição no **VS Code**.
 
+## Conceito Visual — Tela Inicial
+
+![Conceito visual da tela inicial do Distrito Zero](docs/images/distrito-zero-main-menu-concept.jpg)
+
+Esta arte define a direção visual inicial do projeto: uma cidade cyberpunk em ruínas, atmosfera de sobrevivência, protagonista em terceira pessoa, iluminação dramática e interface com foco em **Novo Jogo**, **Configurações**, **Créditos** e **Sair**.
+
+> A imagem acima é uma referência conceitual de direção de arte. A implementação final no Unity poderá evoluir com animações, partículas, iluminação dinâmica, áudio ambiente e transições de interface.
+
 ## Como abrir
 
 1. Instale o **Unity Hub**.
