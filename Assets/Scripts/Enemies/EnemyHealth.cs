@@ -9,6 +9,8 @@ namespace DistritoZero.Enemies
         [SerializeField] private float maxHealth = 75f;
         [SerializeField] private string enemyId = "security-drone-01";
         public float CurrentHealth { get; private set; }
+        public float MaxHealth => maxHealth;
+        public float HealthRatio => maxHealth <= 0f ? 0f : Mathf.Clamp01(CurrentHealth / maxHealth);
         public bool IsDead { get; private set; }
 
         private void Awake() => CurrentHealth = maxHealth;

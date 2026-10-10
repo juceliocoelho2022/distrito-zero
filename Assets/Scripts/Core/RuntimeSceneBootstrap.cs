@@ -82,7 +82,10 @@ namespace DistritoZero.Core
             var drone = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             drone.name = "SecurityDrone"; drone.transform.position = new Vector3(0,1.3f,12); drone.transform.localScale = Vector3.one * 1.4f;
             SetColor(drone, new Color(0.9f,0.15f,0.1f));
-            drone.AddComponent<EnemyHealth>(); drone.AddComponent<EnemyCombat>(); drone.AddComponent<EnemyAI>();
+            drone.AddComponent<EnemyHealth>();
+            drone.AddComponent<EnemyHealthBar>();
+            drone.AddComponent<EnemyCombat>();
+            drone.AddComponent<EnemyAI>();
 
             var exit = CreateCube("ExitZone", new Vector3(0,0.15f,21), new Vector3(4,0.3f,3), new Color(0.1f,1f,0.3f));
             var box = exit.GetComponent<BoxCollider>(); box.isTrigger = true;
@@ -115,7 +118,7 @@ namespace DistritoZero.Core
 
         private void OnGUI()
         {
-            GUI.Box(new Rect(15,15,480,105), "DISTRITO ZERO — v0.2.5");
+            GUI.Box(new Rect(15,15,480,105), "DISTRITO ZERO — v0.2.6");
             if (mission != null) GUI.Label(new Rect(30,45,450,25), "OBJETIVO: " + mission.ObjectiveText);
             if (playerHealth != null) GUI.Label(new Rect(30,70,220,25), $"VIDA: {playerHealth.CurrentHealth:0}/{playerHealth.MaxHealth:0}");
             if (xp != null) GUI.Label(new Rect(260,70,180,25), $"XP: {xp.CurrentXp}");
