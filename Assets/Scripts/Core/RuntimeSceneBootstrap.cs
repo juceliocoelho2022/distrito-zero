@@ -15,6 +15,7 @@ namespace DistritoZero.Core
         private InteractionDetector interaction;
         private PlayerHealth playerHealth;
         private PlayerExperience xp;
+        private PlayerShooter shooter;
         private MissionManager mission;
         private ChallengeManager challenge;
         private GameManager game;
@@ -50,7 +51,7 @@ namespace DistritoZero.Core
             challenge = new GameObject("ChallengeManager").AddComponent<ChallengeManager>();
             mission = new GameObject("MissionManager").AddComponent<MissionManager>();
 
-            var floor = CreateCube("Street", new Vector3(0,-0.5f,8), new Vector3(18,1,32), new Color(0.08f,0.09f,0.12f));
+            CreateCube("Street", new Vector3(0,-0.5f,8), new Vector3(18,1,32), new Color(0.08f,0.09f,0.12f));
             CreateCube("NeonLeft", new Vector3(-8,1,8), new Vector3(1,3,32), new Color(0.05f,0.3f,0.55f));
             CreateCube("NeonRight", new Vector3(8,1,8), new Vector3(1,3,32), new Color(0.45f,0.05f,0.5f));
 
@@ -58,8 +59,13 @@ namespace DistritoZero.Core
             p.name = "Player"; p.transform.position = new Vector3(0,1, -4);
             Object.Destroy(p.GetComponent<CapsuleCollider>());
             var cc = p.AddComponent<CharacterController>(); cc.height = 2f; cc.radius = .45f;
-            p.AddComponent<PlayerController>(); playerHealth = p.AddComponent<PlayerHealth>(); p.AddComponent<PlayerCombat>();
-            interaction = p.AddComponent<InteractionDetector>(); xp = p.AddComponent<PlayerExperience>(); player = p.transform;
+            p.AddComponent<PlayerController>();
+            playerHealth = p.AddComponent<PlayerHealth>();
+            p.AddComponent<PlayerCombat>();
+            shooter = p.AddComponent<PlayerShooter>();
+            interaction = p.AddComponent<InteractionDetector>();
+            xp = p.AddComponent<PlayerExperience>();
+            player = p.transform;
 
             var camObj = new GameObject("Main Camera"); camObj.tag = "MainCamera";
             var cam = camObj.AddComponent<Camera>(); cam.fieldOfView = 65f;
@@ -91,11 +97,13 @@ namespace DistritoZero.Core
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube); go.name = name; go.transform.position = pos; go.transform.localScale = scale; SetColor(go,color); return go;
         }
+
         private void SetColor(GameObject go, Color color)
         {
             var renderer = go.GetComponent<Renderer>();
             if (renderer != null) { var mat = new Material(Shader.Find("Standard")); mat.color = color; renderer.material = mat; }
         }
+
         private void OnXp(int amount) { flash = $"+{amount} XP"; flashUntil = Time.time + 2f; }
         private void OnDeath() { flash = "Você foi derrotado. Pressione R para reiniciar."; flashUntil = float.PositiveInfinity; }
 
@@ -107,14 +115,16 @@ namespace DistritoZero.Core
 
         private void OnGUI()
         {
-            GUI.Box(new Rect(15,15,480,105), "DISTRITO ZERO — v0.1");
+            GUI.Box(new Rect(15,15,480,105), "DISTRITO ZERO — v0.2.2");
             if (mission != null) GUI.Label(new Rect(30,45,450,25), "OBJETIVO: " + mission.ObjectiveText);
             if (playerHealth != null) GUI.Label(new Rect(30,70,220,25), $"VIDA: {playerHealth.CurrentHealth:0}/{playerHealth.MaxHealth:0}");
             if (xp != null) GUI.Label(new Rect(260,70,180,25), $"XP: {xp.CurrentXp}");
             if (interaction != null && !string.IsNullOrWhiteSpace(interaction.CurrentPrompt)) GUI.Label(new Rect(30,95,440,25), interaction.CurrentPrompt);
 
-            GUI.Box(new Rect(Screen.width-310,15,295,120), "CONTROLES");
-            GUI.Label(new Rect(Screen.width-295,45,270,80), "WASD: mover | Shift: correr\nEspaço: pular | E: interagir\nF: atacar | R: reiniciar");
+            GUI.Box(new Rect(Screen.width-310,15,295,135), "CONTROLES");
+            GUI.Label(new Rect(Screen.width-295,45,270,95), "WASD: mover | Shift: correr\nEspaço: pular | E: interagir\nMouse: mirar | Clique esquerdo: atirar\nF: ataque corpo a corpo | R: reiniciar");
+
+            DrawCrosshair();
 
             if (challenge != null && challenge.IsVisible)
             {
@@ -124,12 +134,29 @@ namespace DistritoZero.Core
                 if (GUI.Button(new Rect(r.x+25,r.y+165,530,45), "2 — Rota de emergência")) challenge.SubmitAnswer(1);
                 GUI.Label(new Rect(r.x+25,r.y+220,530,35), challenge.Feedback);
             }
+
             if (Time.time < flashUntil) GUI.Label(new Rect(Screen.width/2f-180,145,360,40), flash);
             if (game != null && game.ChapterFinished)
             {
                 GUI.Box(new Rect(Screen.width/2f-230, Screen.height/2f-90,460,180), "CAPÍTULO CONCLUÍDO");
                 GUI.Label(new Rect(Screen.width/2f-190, Screen.height/2f-35,380,50), "Você escapou do Distrito Zero!\nPressione R para jogar novamente.");
             }
+        }
+
+        private void DrawCrosshair()
+        {
+            Color previous = GUI.color;
+            if (shooter != null && Time.time < shooter.FeedbackUntil && shooter.LastShotHit)
+                GUI.color = new Color(1f, 0.25f, 0.2f);
+
+            var style = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 26,
+                fontStyle = FontStyle.Bold
+            };
+            GUI.Label(new Rect(Screen.width/2f-20, Screen.height/2f-20, 40, 40), "+", style);
+            GUI.color = previous;
         }
     }
 
