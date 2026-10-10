@@ -38,9 +38,11 @@ namespace DistritoZero.Player
             if (cooldown == null) cooldown = new ShotCooldown(shotCooldown);
             if (!cooldown.TryConsume(Time.time)) return false;
 
-            LastShotHit = ShootFromScreenCenter();
+            LastShotHit = ShootFromScreenCenter(out Vector3 beamStart, out Vector3 beamEnd);
             LastFeedbackState = ResolveFeedbackState(LastShotHit);
             FeedbackUntil = Time.time + 0.12f;
+
+            ShotVisualEffect.Spawn(beamStart, beamEnd, LastShotHit);
             return true;
         }
 
@@ -49,12 +51,20 @@ namespace DistritoZero.Player
             return hit ? ShotFeedbackState.Hit : ShotFeedbackState.Fired;
         }
 
-        private bool ShootFromScreenCenter()
+        private bool ShootFromScreenCenter(out Vector3 beamStart, out Vector3 beamEnd)
         {
             Camera camera = Camera.main;
-            if (camera == null) return false;
+            if (camera == null)
+            {
+                beamStart = transform.position + Vector3.up;
+                beamEnd = beamStart + transform.forward * shotRange;
+                return false;
+            }
 
             Ray ray = camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            beamStart = ray.origin + ray.direction * 0.35f;
+            beamEnd = ray.GetPoint(shotRange);
+
             RaycastHit[] hits = Physics.RaycastAll(ray, shotRange, ~0, QueryTriggerInteraction.Ignore);
             Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
 
@@ -63,6 +73,7 @@ namespace DistritoZero.Player
                 var playerHealth = hit.collider.GetComponentInParent<PlayerHealth>();
                 if (playerHealth != null) continue;
 
+                beamEnd = hit.point;
                 IDamageable damageable = FindDamageable(hit.collider);
                 if (damageable != null)
                     return ApplyDamage(damageable, shotDamage);
