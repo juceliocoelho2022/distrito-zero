@@ -2,6 +2,7 @@ using NUnit.Framework;
 using DistritoZero.Core;
 using DistritoZero.Challenges;
 using DistritoZero.Missions;
+using DistritoZero.Player;
 
 namespace DistritoZero.Tests.EditMode
 {
@@ -45,6 +46,14 @@ namespace DistritoZero.Tests.EditMode
             Assert.AreEqual(MissionStep.FindTerminal, mission.CurrentStep);
             mission.Advance(MissionEvent.EnemyDefeated);
             Assert.AreEqual(MissionStep.FindTerminal, mission.CurrentStep);
+        }
+
+        [TestCase(-120f, -70f)]
+        [TestCase(120f, 70f)]
+        [TestCase(25f, 25f)]
+        public void Camera_ClampPitch_RespectsConfiguredLimits(float input, float expected)
+        {
+            Assert.AreEqual(expected, ThirdPersonCamera.ClampPitch(input, -70f, 70f));
         }
     }
 }
