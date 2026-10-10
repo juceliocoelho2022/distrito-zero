@@ -3,11 +3,24 @@ using DistritoZero.Core;
 using DistritoZero.Challenges;
 using DistritoZero.Missions;
 using DistritoZero.Player;
+using DistritoZero.Combat;
 
 namespace DistritoZero.Tests.EditMode
 {
     public class DistritoZeroCoreTests
     {
+        private sealed class FakeDamageable : IDamageable
+        {
+            public bool IsDead { get; private set; }
+            public float DamageTaken { get; private set; }
+
+            public void TakeDamage(float amount)
+            {
+                if (IsDead || amount <= 0f) return;
+                DamageTaken += amount;
+            }
+        }
+
         [SetUp]
         public void Setup() => GameEvents.ResetAll();
 
@@ -54,6 +67,25 @@ namespace DistritoZero.Tests.EditMode
         public void Camera_ClampPitch_RespectsConfiguredLimits(float input, float expected)
         {
             Assert.AreEqual(expected, ThirdPersonCamera.ClampPitch(input, -70f, 70f));
+        }
+
+        [Test]
+        public void Shooting_ValidTarget_ReceivesConfiguredDamage()
+        {
+            var target = new FakeDamageable();
+
+            Assert.IsTrue(PlayerShooter.ApplyDamage(target, 30f));
+            Assert.AreEqual(30f, target.DamageTaken);
+        }
+
+        [Test]
+        public void Shooting_Cooldown_BlocksUntilNextAllowedTime()
+        {
+            var gate = new ShotCooldown(0.4f);
+
+            Assert.IsTrue(gate.TryConsume(1.0f));
+            Assert.IsFalse(gate.TryConsume(1.2f));
+            Assert.IsTrue(gate.TryConsume(1.4f));
         }
     }
 }
