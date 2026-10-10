@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using UnityEngine;
 using DistritoZero.Core;
@@ -132,6 +133,26 @@ namespace DistritoZero.Tests.EditMode
             Assert.AreEqual(45f / 75f, ratio, 0.0001f);
 
             Object.DestroyImmediate(enemy);
+        }
+
+        [Test]
+        public void EnemyHealthBar_TypeExists_ForWorldSpaceUi()
+        {
+            var type = typeof(EnemyHealth).Assembly.GetType("DistritoZero.Enemies.EnemyHealthBar");
+            Assert.IsNotNull(type, "EnemyHealthBar component must exist for the world-space enemy UI.");
+        }
+
+        [Test]
+        public void EnemyHealthBar_ExposesDamagePopupLifetimeRule()
+        {
+            var type = typeof(EnemyHealth).Assembly.GetType("DistritoZero.Enemies.EnemyHealthBar");
+            Assert.IsNotNull(type, "EnemyHealthBar component must exist before testing popup lifetime.");
+
+            var method = type.GetMethod("IsDamagePopupVisible", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            Assert.IsNotNull(method, "EnemyHealthBar must expose IsDamagePopupVisible(currentTime, shownAt, duration).");
+
+            Assert.IsTrue((bool)method.Invoke(null, new object[] { 1.2f, 1.0f, 0.35f }));
+            Assert.IsFalse((bool)method.Invoke(null, new object[] { 1.36f, 1.0f, 0.35f }));
         }
 
         [Test]
