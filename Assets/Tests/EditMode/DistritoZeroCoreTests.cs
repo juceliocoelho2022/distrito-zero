@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using UnityEngine;
 using DistritoZero.Core;
 using DistritoZero.Challenges;
 using DistritoZero.Missions;
@@ -108,6 +109,29 @@ namespace DistritoZero.Tests.EditMode
         public void ShotVfx_Impact_IsOnlyShownForDamageableHit(bool hitDamageable, bool expected)
         {
             Assert.AreEqual(expected, ShotVisualEffect.ShouldShowImpact(hitDamageable));
+        }
+
+        [Test]
+        public void EnemyHealth_Exposes_MaxHealth_ForHealthBar()
+        {
+            var property = typeof(EnemyHealth).GetProperty("MaxHealth");
+            Assert.IsNotNull(property, "EnemyHealth must expose MaxHealth for the world-space health bar.");
+        }
+
+        [Test]
+        public void EnemyHealth_HealthRatio_TracksDamage()
+        {
+            var property = typeof(EnemyHealth).GetProperty("HealthRatio");
+            Assert.IsNotNull(property, "EnemyHealth must expose HealthRatio for the world-space health bar.");
+
+            var enemy = new GameObject("EnemyHealthTest");
+            var health = enemy.AddComponent<EnemyHealth>();
+            health.TakeDamage(30f);
+
+            var ratio = (float)property.GetValue(health);
+            Assert.AreEqual(45f / 75f, ratio, 0.0001f);
+
+            Object.DestroyImmediate(enemy);
         }
 
         [Test]
