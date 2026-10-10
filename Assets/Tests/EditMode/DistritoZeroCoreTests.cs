@@ -89,6 +89,13 @@ namespace DistritoZero.Tests.EditMode
             Assert.IsTrue(gate.TryConsume(1.4f));
         }
 
+        [TestCase(false, ShotFeedbackState.Fired)]
+        [TestCase(true, ShotFeedbackState.Hit)]
+        public void Shooting_Feedback_DistinguishesMissAndHit(bool hit, ShotFeedbackState expected)
+        {
+            Assert.AreEqual(expected, PlayerShooter.ResolveFeedbackState(hit));
+        }
+
         [Test]
         public void EnemyAI_PlayerDetected_TransitionsFromPatrolToAlertThenChase()
         {
