@@ -1,6 +1,6 @@
 {
   "name": "DistritoZero.PlayModeTests",
-  "references": [],
+  "references": ["DistritoZero.Runtime"],
   "optionalUnityReferences": ["TestAssemblies"],
   "includePlatforms": [],
   "excludePlatforms": [],
