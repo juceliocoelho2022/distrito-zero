@@ -115,7 +115,7 @@ namespace DistritoZero.Core
 
         private void OnGUI()
         {
-            GUI.Box(new Rect(15,15,480,105), "DISTRITO ZERO — v0.2.4");
+            GUI.Box(new Rect(15,15,480,105), "DISTRITO ZERO — v0.2.5");
             if (mission != null) GUI.Label(new Rect(30,45,450,25), "OBJETIVO: " + mission.ObjectiveText);
             if (playerHealth != null) GUI.Label(new Rect(30,70,220,25), $"VIDA: {playerHealth.CurrentHealth:0}/{playerHealth.MaxHealth:0}");
             if (xp != null) GUI.Label(new Rect(260,70,180,25), $"XP: {xp.CurrentXp}");
